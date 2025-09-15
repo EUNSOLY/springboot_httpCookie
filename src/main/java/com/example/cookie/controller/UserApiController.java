@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,18 +21,24 @@ public class UserApiController {
 
     @GetMapping("/me")
     public UserDto me(
-            HttpServletRequest httpServletRequest
+            HttpServletRequest httpServletRequest,
+            @CookieValue(name = "authorization-cookie", required = false)
+            String authorizationCookie
 
     ){
-        var cookies = httpServletRequest.getCookies();
+        log.info("authorizationCookie : {}", authorizationCookie);
+        var optionalUserDto = userRepository.findById(authorizationCookie);
+        return optionalUserDto.get();
 
-        if(cookies != null){
-            for (Cookie cookie: cookies){
-                log.info("key : {}, value:{}", cookie.getName(),cookie.getValue());
+//        var cookies = httpServletRequest.getCookies();
+//
+//        if(cookies != null){
+//            for (Cookie cookie: cookies){
+//                log.info("key : {}, value:{}", cookie.getName(),cookie.getValue());
+//
+//            }
+//        }
 
-            }
-        }
-
-        return  null;
+//        return  null;
     }
 }
