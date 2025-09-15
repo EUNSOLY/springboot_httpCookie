@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
 
-    public void login(
+    public String login(
             LoginRequest loginRequest,
             HttpServletResponse httpServletResponse
     ){
@@ -25,21 +25,13 @@ public class UserService {
         if(optionalUser.isPresent()){
             var userDto = optionalUser.get();
             if(userDto.getPassword().equals(password)){
-                // 쿠키 해당 정보 저장
-                // JWT 토큰이 될수도..특정값  내려주기
-                var cookie = new Cookie("authorization-cookie", userDto.getId());
-                cookie.setDomain("localhost"); // 특정 도메인값 넣어주기 (회사일경우 회사 도메인) ex) naver.com, daum.net 등등
-                cookie.setPath("/"); // 경로지정
-                cookie.setMaxAge(-1); // session과 동일 -1 : 연결된 동안만 사용
-                cookie.setHttpOnly(true); // 자바스크립트에서 현재값을 읽을 수 없도록 보안처리
-                cookie.setSecure(true); // https에서만 사용이 되도록 설정
-                httpServletResponse.addCookie(cookie);
-
-            }else{
-                throw new RuntimeException("패스워드가 맞지않습니다.");
+                return userDto.getId();
             }
         }else{
             throw new RuntimeException("유저가 존재 하지 않습니다.");
         }
+
+        return null;
+
     }
 }
